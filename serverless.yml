@@ -1,0 +1,72 @@
+
+service: flashcards-media
+
+frameworkVersion: "=1.44.1"
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: us-west-2
+
+resources:
+  Resources:
+
+    S3BucketUserImages:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: flashcards-media-${self:provider.stage}-user-images
+
+    IdentityPoolUserImages:
+      Type: AWS::Cognito::IdentityPool
+      Properties:
+        IdentityPoolName: flashcards_media_${self:provider.stage}_identity_pool
+        AllowUnauthenticatedIdentities: true
+
+    IdentityPoolUserImagesUnauthRole:
+      Type: AWS::IAM::Role
+      Properties:
+        RoleName: flashcards_media_${self:provider.stage}_identity_pool_unauth_role
+        AssumeRolePolicyDocument:
+          Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Principal:
+                Federated: cognito-identity.amazonaws.com
+              Action: sts:AssumeRoleWithWebIdentity
+              Condition:
+                StringEquals:
+                  cognito-identity.amazonaws.com:aud: !Ref IdentityPoolUserImages
+                ForAnyValue:StringLike:
+                  cognito-identity.amazonaws.com:amr: unauthenticated
+        Policies:
+          - PolicyName: flashcards_media_${self:provider.stage}_unauth_role_default_policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - "mobileanalytics:PutEvents"
+                    - "cognito-sync:*"
+                  Resource: "*"
+          - PolicyName: flashcards_media_${self:provider.stage}_unauth_role_s3_access_policy
+            PolicyDocument:
+              Version: "2012-10-17"
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - "s3:PutObject"
+                    - "s3:DeleteObject"
+                    - "s3:PutObjectAcl"
+                  Resource: !Join
+                    - ''
+                    - - !GetAtt S3BucketUserImages.Arn
+                      - '/*'
+
+    IdentityPoolUserImagesRoleAttachment:
+      Type: AWS::Cognito::IdentityPoolRoleAttachment
+      Properties:
+        IdentityPoolId:
+          Ref: IdentityPoolUserImages
+        Roles:
+          unauthenticated: !GetAtt IdentityPoolUserImagesUnauthRole.Arn
