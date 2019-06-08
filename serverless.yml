@@ -53,10 +53,10 @@ resources:
                 - !Join
                   - ''
                   - - !GetAtt S3BucketUserImages.Arn
-                    # - '/*'
-                    # - '/users/us-west-2:fadeacc6-699e-4ff0-a589-867a140136f8/*'
+                    # - '/*' # <-- access granted (but does not restrictive to user)
+                    # - '/users/fadeacc6-699e-4ff0-a589-867a140136f8/*' # <-- access granted to my test user
                     - '/users/${'
-                    - 'cognito-identity.amazonaws.com:sub}/*'
+                    - 'cognito-identity.amazonaws.com:sub}/*' # <-- access denied
 
               # Condition:
               #   StringEquals:
