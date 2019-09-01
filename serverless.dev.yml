@@ -1,0 +1,5 @@
+
+cors:
+  allowedOrigins:
+    - https://flash-local.overattribution.com:9000
+    - https://flash-dev.overattribution.com

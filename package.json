@@ -1,10 +1,11 @@
 {
-  "name": "flashcards-media",
+  "name": "flash-media",
   "version": "1.0.0",
   "license": "ISC",
   "author": "Corey Ferguson",
   "scripts": {
-    "deploy": "sls deploy"
+    "deploy": "./node_modules/.bin/sls deploy",
+    "remove": "./node_modules/.bin/sls remove"
   },
   "devDependencies": {
     "serverless": "^1.44.1"

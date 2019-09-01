@@ -1,11 +1,11 @@
 
-# flashcards-media
+# flash-media
 
 ## Set up project
 
 ```bash
-git clone https://github.com/coreyferguson/flashcards-media
-cd flashcards-media
+git clone https://github.com/coreyferguson/flash-media
+cd flash-media
 npm install
 ```
 

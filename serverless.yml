@@ -1,12 +1,12 @@
 
-service: flashcards-media
+service: flash-media
 
 frameworkVersion: "=1.44.1"
 
 provider:
   name: aws
   runtime: nodejs10.x
-  stage: dev
+  stage: ${opt:stage, env:stage, 'dev'}
   region: us-west-2
 
 resources:
@@ -15,64 +15,34 @@ resources:
     S3BucketUserImages:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: flashcards-media-${self:provider.stage}-user-images
+        BucketName: overattribution-flash-${self:provider.stage}-media
         CorsConfiguration:
           CorsRules:
             - AllowedHeaders:
-                - authorization
-                - content-type
-                - content-md5
-                - x-amz-content-sha256
-                - x-amz-date
-                - x-amz-security-token
-                - x-amz-user-agent
+                - '*'
               AllowedMethods:
-                - GET
                 - PUT
-              AllowedOrigins:
-                - http://localhost:8080
-        VersioningConfiguration:
-          Status: Enabled
+                - GET
+              AllowedOrigins: ${file(./serverless.${self:provider.stage}.yml):cors.allowedOrigins}
+              MaxAge: 3000
 
     ManagedPolicyS3BucketAccess:
       Type: AWS::IAM::ManagedPolicy
       Properties:
         Description: S3 bucket upload access
-        ManagedPolicyName: flashcards-media-${self:provider.stage}-s3-upload-access
+        ManagedPolicyName: overattribution-flash-media-${self:provider.stage}-s3-access
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
             - Effect: Allow
               Action:
-                - "s3:*"
-                # - "s3:GetObject"
-                # - "s3:PutObject"
-                # - "s3:PutObjectAcl"
-
+                - "s3:GetObject"
+                - "s3:PutObject"
               Resource:
                 - !Join
                   - ''
                   - - !GetAtt S3BucketUserImages.Arn
-                    # - '/*' # <-- access granted (but does not restrictive to user)
-                    # - '/users/fadeacc6-699e-4ff0-a589-867a140136f8/*' # <-- access granted to my test user
-                    - '/users/${'
-                    - 'cognito-identity.amazonaws.com:sub}/*' # <-- access denied
-
-              # Condition:
-              #   StringEquals:
-              #     "cognito-identity.amazonaws.com:sub": "fadeacc6-699e-4ff0-a589-867a140136f8"
-
-
-            # This works:
-            # - Effect: Allow
-            #   Action:
-            #     - "s3:GetObject"
-            #     - "s3:PutObject"
-            #     - "s3:DeleteObject"
-            #   Resource: !Join
-            #     - ''
-            #     - - !GetAtt S3BucketUserImages.Arn
-            #       - ':users/fadeacc6-699e-4ff0-a589-867a140136f8/*'
-
+                    - '/${'
+                    - 'cognito-identity.amazonaws.com:sub}/*'
         Roles:
-          - overattribution_identity_${self:provider.stage}_identity_pool_auth_role
+          - overattribution_auth_${self:provider.stage}_identity_pool_auth_role
