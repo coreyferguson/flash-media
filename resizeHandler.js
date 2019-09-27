@@ -21,15 +21,16 @@ module.exports.resize = event => {
     const resizeStream = module.exports.streamToSharp({
       width: 500,
       height: 300,
-      fit: sharp.fit.contain
+      fit: sharp.fit.inside
     });
     const { writeStream, uploadFinished } = module.exports.writeStreamToS3({ Bucket: BUCKET, Key: outputObjectKey });
     readStream.pipe(resizeStream).pipe(writeStream);
 
     uploadFinished.then(() => {
       console.log('finished uploading');
+      if (inputObjectKey !== outputObjectKey)
+        module.exports.deleteObject({ Bucket: BUCKET, Key: inputObjectKey })
     });
-
   } catch (err) {
     console.error(err)
   }
@@ -62,6 +63,13 @@ module.exports.getObjectKey = event => {
 
 module.exports.getTargetObjectKey = objectKey => {
   return objectKey.replace(/\.\w+$/, '.jpg');
+};
+
+module.exports.deleteObject = ({ Bucket, Key }) => {
+  return s3.deleteObject({ Bucket, Key }, function(err, data) {
+    if (err) console.error(err, err.stack);
+    else console.error(data);
+  }).promise();
 };
 
 // module.exports.resize();
