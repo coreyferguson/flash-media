@@ -8,6 +8,19 @@ provider:
   runtime: nodejs10.x
   stage: ${opt:stage, env:stage, 'dev'}
   region: us-west-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource:
+        - "*"
+
+functions:
+  resize:
+    handler: resizeHandler.resize
+    events:
+      - s3: UserImages
 
 resources:
   Resources:
@@ -46,3 +59,12 @@ resources:
                     - 'cognito-identity.amazonaws.com:sub}/*'
         Roles:
           - overattribution_auth_${self:provider.stage}_identity_pool_auth_role
+
+    ResizeLambdaPermissionUserImagesS3:
+      Type: AWS::Lambda::Permission
+      Properties:
+        FunctionName: !GetAtt ResizeLambdaFunction.Arn
+        Principal: s3.amazonaws.com
+        Action: lambda:InvokeFunction
+        SourceAccount: 863138142000
+        SourceArn: arn:aws:s3:::overattribution-flash-${self:provider.stage}-media

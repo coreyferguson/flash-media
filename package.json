@@ -9,5 +9,8 @@
   },
   "devDependencies": {
     "serverless": "^1.44.1"
+  },
+  "dependencies": {
+    "sharp": "^0.23.1"
   }
 }
