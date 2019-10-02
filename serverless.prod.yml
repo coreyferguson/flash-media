@@ -1,4 +1,4 @@
 
 cors:
   allowedOrigins:
-    - https://flash.overattribution.com:9000
+    - https://flash.overattribution.com
