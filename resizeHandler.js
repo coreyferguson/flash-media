@@ -8,32 +8,30 @@ const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 module.exports = {};
 
 module.exports.resize = event => {
-  console.log('handler called');
+  // const BUCKET = 'growme-flash-dev-media';
+  // const URL = `http://${BUCKET}.s3-website.us-west-2.amazonaws.com`;
 
-  const BUCKET = 'overattribution-flash-dev-media';
-  const URL = `http://${BUCKET}.s3-website.us-west-2.amazonaws.com`;
+  // try {
+  //   const inputObjectKey = module.exports.getObjectKey(event);
+  //   const outputObjectKey = module.exports.getTargetObjectKey(inputObjectKey);
+  //   const readStream = module.exports.readStreamFromS3({ Bucket: BUCKET, Key: inputObjectKey });
+  //   const width = 500, height = 300;
+  //   const resizeStream = module.exports.streamToSharp({
+  //     width: 500,
+  //     height: 300,
+  //     fit: sharp.fit.inside
+  //   });
+  //   const { writeStream, uploadFinished } = module.exports.writeStreamToS3({ Bucket: BUCKET, Key: outputObjectKey });
+  //   readStream.pipe(resizeStream).pipe(writeStream);
 
-  try {
-    const inputObjectKey = module.exports.getObjectKey(event);
-    const outputObjectKey = module.exports.getTargetObjectKey(inputObjectKey);
-    const readStream = module.exports.readStreamFromS3({ Bucket: BUCKET, Key: inputObjectKey });
-    const width = 500, height = 300;
-    const resizeStream = module.exports.streamToSharp({
-      width: 500,
-      height: 300,
-      fit: sharp.fit.inside
-    });
-    const { writeStream, uploadFinished } = module.exports.writeStreamToS3({ Bucket: BUCKET, Key: outputObjectKey });
-    readStream.pipe(resizeStream).pipe(writeStream);
-
-    uploadFinished.then(() => {
-      console.log('finished uploading');
-      if (inputObjectKey !== outputObjectKey)
-        module.exports.deleteObject({ Bucket: BUCKET, Key: inputObjectKey })
-    });
-  } catch (err) {
-    console.error(err)
-  }
+  //   uploadFinished.then(() => {
+  //     console.log('finished uploading');
+  //     if (inputObjectKey !== outputObjectKey)
+  //       module.exports.deleteObject({ Bucket: BUCKET, Key: inputObjectKey })
+  //   });
+  // } catch (err) {
+  //   console.error(err)
+  // }
 }
 
 module.exports.readStreamFromS3 = ({ Bucket, Key }) => {

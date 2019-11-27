@@ -15,7 +15,7 @@ provider:
         - s3:GetObject
         - s3:DeleteObject
       Resource:
-        - arn:aws:s3:::overattribution-flash-${self:provider.stage}-media/*
+        - arn:aws:s3:::growme-flash-${self:provider.stage}-media/*
 
 functions:
   resize:
@@ -29,7 +29,7 @@ resources:
     S3BucketUserImages:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: overattribution-flash-${self:provider.stage}-media
+        BucketName: growme-flash-${self:provider.stage}-media
         CorsConfiguration:
           CorsRules:
             - AllowedHeaders:
@@ -44,7 +44,7 @@ resources:
       Type: AWS::IAM::ManagedPolicy
       Properties:
         Description: S3 bucket upload access
-        ManagedPolicyName: overattribution-flash-media-${self:provider.stage}-s3-access
+        ManagedPolicyName: growme-flash-media-${self:provider.stage}-s3-access
         PolicyDocument:
           Version: "2012-10-17"
           Statement:
@@ -59,7 +59,7 @@ resources:
                     - '/${'
                     - 'cognito-identity.amazonaws.com:sub}/*'
         Roles:
-          - overattribution_auth_${self:provider.stage}_identity_pool_auth_role
+          - growme_auth_${self:provider.stage}_identity_pool_auth_role
 
     ResizeLambdaPermissionUserImagesS3:
       Type: AWS::Lambda::Permission
@@ -68,4 +68,4 @@ resources:
         Principal: s3.amazonaws.com
         Action: lambda:InvokeFunction
         SourceAccount: 863138142000
-        SourceArn: arn:aws:s3:::overattribution-flash-${self:provider.stage}-media
+        SourceArn: arn:aws:s3:::growme-flash-${self:provider.stage}-media

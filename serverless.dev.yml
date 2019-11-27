@@ -1,5 +1,5 @@
 
 cors:
   allowedOrigins:
-    - https://flash-local.overattribution.com:9000
-    - https://flash-dev.overattribution.com
+    - https://flash-local.growme.fyi:9000
+    - https://flash-dev.growme.fyi
