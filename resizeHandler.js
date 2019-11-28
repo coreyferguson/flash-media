@@ -2,36 +2,40 @@
 const AWS = require('aws-sdk')
 const sharp = require('sharp');
 const stream = require('stream')
+const logger = require('./logger');
 
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
 module.exports = {};
 
 module.exports.resize = event => {
-  // const BUCKET = 'growme-flash-dev-media';
-  // const URL = `http://${BUCKET}.s3-website.us-west-2.amazonaws.com`;
+  const inputObjectKey = module.exports.getObjectKey(event);
+  if (inputObjectKey.endsWith('_500x300.jpg')) {
+    logger.info('resize(), object already processed', { inputObjectKey })
+    return;
+  }
+  logger.info('resize(), processing', { inputObjectKey })
+  const Bucket = 'growme-flash-dev-media';
+  try {
+    // const inputObjectKey = module.exports.getObjectKey(event);
+    const outputObjectKey = module.exports.getTargetObjectKey(inputObjectKey);
+    const readStream = module.exports.readStreamFromS3({ Bucket, Key: inputObjectKey });
+    const resizeStream = module.exports.streamToSharp({
+      width: 500,
+      height: 300,
+      fit: sharp.fit.inside
+    });
+    const { writeStream, uploadFinished } = module.exports.writeStreamToS3({ Bucket, Key: outputObjectKey });
+    readStream.pipe(resizeStream).pipe(writeStream);
 
-  // try {
-  //   const inputObjectKey = module.exports.getObjectKey(event);
-  //   const outputObjectKey = module.exports.getTargetObjectKey(inputObjectKey);
-  //   const readStream = module.exports.readStreamFromS3({ Bucket: BUCKET, Key: inputObjectKey });
-  //   const width = 500, height = 300;
-  //   const resizeStream = module.exports.streamToSharp({
-  //     width: 500,
-  //     height: 300,
-  //     fit: sharp.fit.inside
-  //   });
-  //   const { writeStream, uploadFinished } = module.exports.writeStreamToS3({ Bucket: BUCKET, Key: outputObjectKey });
-  //   readStream.pipe(resizeStream).pipe(writeStream);
-
-  //   uploadFinished.then(() => {
-  //     console.log('finished uploading');
-  //     if (inputObjectKey !== outputObjectKey)
-  //       module.exports.deleteObject({ Bucket: BUCKET, Key: inputObjectKey })
-  //   });
-  // } catch (err) {
-  //   console.error(err)
-  // }
+    uploadFinished.then(() => {
+      logger.info('resize(), finished uploading');
+      if (inputObjectKey !== outputObjectKey)
+        module.exports.deleteObject({ Bucket, Key: inputObjectKey })
+    });
+  } catch (err) {
+    console.error(err)
+  }
 }
 
 module.exports.readStreamFromS3 = ({ Bucket, Key }) => {
@@ -60,7 +64,7 @@ module.exports.getObjectKey = event => {
 };
 
 module.exports.getTargetObjectKey = objectKey => {
-  return objectKey.replace(/\.\w+$/, '.jpg');
+  return objectKey.replace(/\.\w+$/, '_500x300.jpg');
 };
 
 module.exports.deleteObject = ({ Bucket, Key }) => {

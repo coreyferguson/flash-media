@@ -11,6 +11,7 @@
     "serverless": "^1.44.1"
   },
   "dependencies": {
+    "logger-for-kibana": "^1.0.2",
     "sharp": "^0.23.1"
   }
 }

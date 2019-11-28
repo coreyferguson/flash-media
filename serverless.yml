@@ -69,3 +69,20 @@ resources:
         Action: lambda:InvokeFunction
         SourceAccount: 863138142000
         SourceArn: arn:aws:s3:::growme-flash-${self:provider.stage}-media
+
+    # Allow Lambda logs to be sent to elasticsearch
+    LambdaPermission:
+      Type: AWS::Lambda::Permission
+      Properties:
+        Action: lambda:InvokeFunction
+        FunctionName: LogsToElasticsearch_growme-logs
+        Principal: logs.us-west-2.amazonaws.com
+        SourceAccount: 863138142000
+        SourceArn: arn:aws:logs:us-west-2:863138142000:log-group:/aws/lambda/flash-api-${self:provider.stage}-graphql:*
+    CloudWatchToElasticSearchSubscriptionFilter:
+      Type: AWS::Logs::SubscriptionFilter
+      Properties:
+        DestinationArn: arn:aws:lambda:us-west-2:863138142000:function:LogsToElasticsearch_growme-logs
+        FilterPattern: ""
+        LogGroupName: /aws/lambda/flash-media-${self:provider.stage}-resize
+      DependsOn: LambdaPermission
