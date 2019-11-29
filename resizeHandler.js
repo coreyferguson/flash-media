@@ -30,8 +30,6 @@ module.exports.resize = event => {
 
     uploadFinished.then(() => {
       logger.info('resize(), finished uploading');
-      if (inputObjectKey !== outputObjectKey)
-        module.exports.deleteObject({ Bucket, Key: inputObjectKey })
     });
   } catch (err) {
     console.error(err)
