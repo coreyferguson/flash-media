@@ -16,6 +16,8 @@ provider:
         - s3:DeleteObject
       Resource:
         - arn:aws:s3:::growme-flash-${self:provider.stage}-media/*
+  environment:
+    stage: ${self:provider.stage}
 
 functions:
   resize:

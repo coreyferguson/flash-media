@@ -3,6 +3,7 @@ const AWS = require('aws-sdk')
 const sharp = require('sharp');
 const stream = require('stream')
 const logger = require('./logger');
+const stage = process.env.stage;
 
 const s3 = new AWS.S3({ apiVersion: '2006-03-01' });
 
@@ -15,9 +16,8 @@ module.exports.resize = event => {
     return;
   }
   logger.info('resize(), processing', { inputObjectKey })
-  const Bucket = 'growme-flash-dev-media';
+  const Bucket = `growme-flash-${stage}-media`;
   try {
-    // const inputObjectKey = module.exports.getObjectKey(event);
     const outputObjectKey = module.exports.getTargetObjectKey(inputObjectKey);
     const readStream = module.exports.readStreamFromS3({ Bucket, Key: inputObjectKey });
     const resizeStream = module.exports.streamToSharp({
