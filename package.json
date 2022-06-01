@@ -12,6 +12,6 @@
   },
   "dependencies": {
     "logger-for-kibana": "^1.0.2",
-    "sharp": "^0.23.1"
+    "sharp": "^0.30.5"
   }
 }
