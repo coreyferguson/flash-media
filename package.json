@@ -8,7 +8,7 @@
     "remove": "./node_modules/.bin/sls remove"
   },
   "devDependencies": {
-    "serverless": "^1.44.1"
+    "serverless": "^1.83.3"
   },
   "dependencies": {
     "logger-for-kibana": "^1.0.2",
